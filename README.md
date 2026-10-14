@@ -8,3 +8,5 @@ Download and extract `cgal-api-fixes-docs.zip`, then open:
 Built from commit `f6095558` with CGAL's documentation configuration and Doxygen 1.18.0 on Windows. These are isolated package builds: references to other packages and bibliography entries are not fully resolved. CGAL's patched Doxygen and full documentation build remain the authority for release documentation.
 
 This branch contains review material only. It is separate from the source pull request.
+
+`cgal-8340-docs.zip` contains the SMDS_3 documentation for the missing counts by subdomain and surface-patch index. It uses the same documentation configuration and Doxygen version described above.

@@ -10,3 +10,5 @@ Built from commit `f6095558` with CGAL's documentation configuration and Doxygen
 This branch contains review material only. It is separate from the source pull request.
 
 `cgal-8340-docs.zip` contains the SMDS_3 documentation for the missing counts by subdomain and surface-patch index. It uses the same documentation configuration and Doxygen version described above.
+
+`cgal-4319-docs.zip` contains the Number_types documentation for exact construction of MP_Float from built-in integral types.

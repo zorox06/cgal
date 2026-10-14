@@ -14,3 +14,5 @@ This branch contains review material only. It is separate from the source pull r
 `cgal-4319-docs.zip` contains the Number_types documentation for exact construction of MP_Float from built-in integral types.
 
 `cgal-8260-docs.zip` contains the STL_Extension documentation for pointer overloads of Compact_container::s_iterator_to().
+
+`cgal-7147-docs.zip` contains the Kernel_23 documentation for the non-degenerate triangle requirement of has_on() and point/triangle do_intersect().

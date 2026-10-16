@@ -11,6 +11,12 @@ This branch contains review material only. It is separate from the source pull r
 
 `cgal-5150-docs.zip` contains the Spatial_searching documentation from commit `f94b7a339f3`, clarifying that Fuzzy_sphere includes its boundary.
 
+`cgal-8064-docs.zip` contains the Triangulation documentation from commit `b91f3d9540f`, describing finite-vertex stream output.
+
+`cgal-5075-docs.zip` contains the manual from commit `5fbd7ae771d`, documenting `CGAL_ENABLE_EXPENSIVE_ASSERTIONS`. Open `Manual/configurationvariables.html`.
+
+`cgal-2855-docs.zip` contains the Arrangement_on_surface_2 documentation from commit `f22de6ebdf9`, documenting the circular-segment traits bounding-box functor.
+
 `cgal-8340-docs.zip` contains the SMDS_3 documentation for the counts by subdomain and surface-patch index. Refreshed from commit `2f7167f7` with the names `number_of_cells_in_subdomain()` and `number_of_facets_in_patch()`. It uses the same documentation configuration and Doxygen version described above.
 
 `cgal-4319-docs.zip` contains the Number_types documentation for exact construction of MP_Float from built-in integral types.

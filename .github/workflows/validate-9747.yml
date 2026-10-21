@@ -1,0 +1,61 @@
+name: Validate CORE saturated bounds for 9747
+
+on:
+  push:
+    branches: [validate-9747-zero-bounds]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        bits: [64, 32]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 4
+      - name: Install dependencies
+        shell: bash
+        run: |
+          if [ '${{ matrix.bits }}' = 32 ]; then
+            sudo dpkg --add-architecture i386
+            sudo apt-get update
+            sudo apt-get install -y cmake g++-multilib libboost-dev:i386 libgmp-dev:i386 libmpfr-dev:i386
+          else
+            sudo apt-get update
+            sudo apt-get install -y cmake g++ libboost-dev libgmp-dev libmpfr-dev
+          fi
+      - name: Reproduce old failures and run UBSan regressions
+        shell: bash
+        run: |
+          includes=()
+          while IFS= read -r directory; do includes+=("-I$directory"); done < <(find "$PWD" -mindepth 2 -maxdepth 2 -type d -name include)
+          flags=(-std=c++17 -O1 -m${{ matrix.bits }} -DCGAL_USE_CORE -frounding-math -fsanitize=undefined -fno-sanitize-recover=undefined)
+          printf '#include <CGAL/CORE/extLong.h>\nstatic_assert(sizeof(long) * 8 == ${{ matrix.bits }});\nint main() {}\n' > /tmp/header.cpp
+          g++ "${flags[@]}" "${includes[@]}" -fsyntax-only /tmp/header.cpp
+          mkdir -p /tmp/before/CGAL/CORE
+          git show ca39f40cfa835d4c6c14956974144c34bd761512:CGAL_Core/include/CGAL/CORE/extLong_impl.h > /tmp/before/CGAL/CORE/extLong_impl.h
+          for test in CORE_extLong CORE_Expr_degree_bound; do
+            g++ "${flags[@]}" -I/tmp/before "${includes[@]}" "Number_types/test/Number_types/$test.cpp" -lmpfr -lgmp -o /tmp/before-test
+            if /tmp/before-test > /tmp/before.log 2>&1; then
+              echo "Expected $test to fail with the previous implementation"
+              exit 1
+            fi
+            cat /tmp/before.log
+            grep -E '(Assertion|assertion).*failed' /tmp/before.log
+            g++ "${flags[@]}" "${includes[@]}" "Number_types/test/Number_types/$test.cpp" -lmpfr -lgmp -o /tmp/fixed-test
+            /tmp/fixed-test
+            echo "UBSan regression passed: $test (${{ matrix.bits }} bits)"
+          done
+      - name: Build and run CORE test suite
+        shell: bash
+        run: |
+          cmake -S Number_types/test/Number_types -B build-number -DCGAL_DIR="$GITHUB_WORKSPACE" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-m${{ matrix.bits }} -DCGAL_USE_CORE" -DCGAL_ENABLE_TESTING=ON
+          cmake --build build-number --target CORE_extLong CORE_Expr_degree_bound CORE_Expr CORE_Expr_ticket_4296 CORE_BigFloat CORE_BigInt CORE_BigRat -j2
+          ctest --test-dir build-number --output-on-failure -R 'CORE_extLong|CORE_Expr|CORE_BigFloat|CORE_BigInt|CORE_BigRat'
